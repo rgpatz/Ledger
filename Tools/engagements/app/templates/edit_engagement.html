@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Edit Engagement{% endblock %}
+{% block content %}
+<h1>Edit Engagement: {{ engagement.engagement_name }}</h1>
+<form method="post" action="{{ url_for('update_engagement_gui', engagement_id=engagement.id) }}">
+    <div><label for="engagement_name">Engagement Name:</label><input type="text" id="engagement_name" name="engagement_name" value="{{ engagement.engagement_name }}" required></div>
+    <div><label for="client_name">Client Name:</label><input type="text" id="client_name" name="client_name" value="{{ engagement.client_name }}" required></div>
+    <div>
+        <label for="engagement_status">Status:</label>
+        <select id="engagement_status" name="engagement_status">
+            {% for status_opt in statuses %}
+            <option value="{{ status_opt.value }}" {% if engagement.status == status_opt %}selected{% endif %}>{{ status_opt.value }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div><label for="start_date">Start Date:</label><input type="date" id="start_date" name="start_date" value="{{ engagement.start_date if engagement.start_date }}"></div>
+    <div><label for="end_date">End Date:</label><input type="date" id="end_date" name="end_date" value="{{ engagement.end_date if engagement.end_date }}"></div>
+    <div><label for="project_lead">Project Lead:</label><input type="text" id="project_lead" name="project_lead" value="{{ engagement.project_lead if engagement.project_lead }}"></div>
+    <div><label for="scope_summary">Scope Summary:</label><textarea id="scope_summary" name="scope_summary" rows="4">{{ engagement.scope_summary if engagement.scope_summary }}</textarea></div>
+    <button type="submit" class="button">Update Engagement</button>
+</form>
+{% endblock %} 
