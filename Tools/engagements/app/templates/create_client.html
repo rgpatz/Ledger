@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}New Client{% endblock %}
+
+{% block content %}
+<h1>Create New Client</h1>
+
+<form action="{{ url_for('create_client_gui') }}" method="post">
+    <div>
+        <label for="name">Client Name (Required):</label>
+        <input type="text" id="name" name="name" required>
+    </div>
+    
+    <div>
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company">
+    </div>
+    
+    <div>
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" rows="3"></textarea>
+    </div>
+    
+    <div>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone">
+    </div>
+    
+    <div>
+        <label for="notes">Notes:</label>
+        <textarea id="notes" name="notes" rows="3"></textarea>
+    </div>
+    
+    <h3>Contact Information</h3>
+    <div id="contacts-container">
+        <div class="contact-entry">
+            <h4>Contact 1</h4>
+            <div>
+                <label for="contact_0_name">Contact Name (Required):</label>
+                <input type="text" id="contact_0_name" name="contact_0_name" required>
+            </div>
+            <div>
+                <label for="contact_0_email">Email (Required):</label>
+                <input type="email" id="contact_0_email" name="contact_0_email" required>
+            </div>
+            <div>
+                <label for="contact_0_title">Title:</label>
+                <input type="text" id="contact_0_title" name="contact_0_title">
+            </div>
+            <div>
+                <label for="contact_0_phone">Phone:</label>
+                <input type="text" id="contact_0_phone" name="contact_0_phone">
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" id="contact_0_is_primary" name="contact_0_is_primary" value="yes" checked>
+                    Primary Contact
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <button type="button" onclick="addContact()" class="button" style="margin: 10px 0;">Add Another Contact</button>
+    
+    <div style="margin-top: 20px;">
+        <button type="submit" class="button">Create Client</button>
+        <a href="{{ url_for('list_clients_gui') }}" class="button" style="background-color: #6c757d; margin-left: 10px;">Cancel</a>
+    </div>
+</form>
+
+<script>
+let contactCount = 1;
+
+function addContact() {
+    const container = document.getElementById('contacts-container');
+    const newContact = document.createElement('div');
+    newContact.className = 'contact-entry';
+    newContact.innerHTML = `
+        <h4>Contact ${contactCount + 1} <button type="button" onclick="removeContact(this)" style="background-color: #dc3545; color: white; border: none; padding: 2px 6px; border-radius: 3px; margin-left: 10px;">Remove</button></h4>
+        <div>
+            <label for="contact_${contactCount}_name">Contact Name (Required):</label>
+            <input type="text" id="contact_${contactCount}_name" name="contact_${contactCount}_name" required>
+        </div>
+        <div>
+            <label for="contact_${contactCount}_email">Email (Required):</label>
+            <input type="email" id="contact_${contactCount}_email" name="contact_${contactCount}_email" required>
+        </div>
+        <div>
+            <label for="contact_${contactCount}_title">Title:</label>
+            <input type="text" id="contact_${contactCount}_title" name="contact_${contactCount}_title">
+        </div>
+        <div>
+            <label for="contact_${contactCount}_phone">Phone:</label>
+            <input type="text" id="contact_${contactCount}_phone" name="contact_${contactCount}_phone">
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" id="contact_${contactCount}_is_primary" name="contact_${contactCount}_is_primary" value="yes">
+                Primary Contact
+            </label>
+        </div>
+    `;
+    container.appendChild(newContact);
+    contactCount++;
+}
+
+function removeContact(button) {
+    button.parentElement.parentElement.remove();
+}
+</script>
+
+{% endblock %} 

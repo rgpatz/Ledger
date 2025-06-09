@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Clients List{% endblock %}
+
+{% block content %}
+<h1>Clients</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Primary Contact</th>
+            <th>Primary Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for client in clients %}
+        <tr>
+            <td>{{ client.id }}</td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.company or '-' }}</td>
+            <td>
+                {% set primary_contact = client.contacts|selectattr("is_primary", "equalto", "yes")|first %}
+                {% if primary_contact %}
+                    {{ primary_contact.name }}
+                {% elif client.contacts %}
+                    {{ client.contacts[0].name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% set primary_contact = client.contacts|selectattr("is_primary", "equalto", "yes")|first %}
+                {% if primary_contact %}
+                    {{ primary_contact.email }}
+                {% elif client.contacts %}
+                    {{ client.contacts[0].email }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>{{ client.phone or '-' }}</td>
+            <td>
+                <a href="{{ url_for('view_client_gui', client_id=client.id) }}">View</a> |
+                <a href="{{ url_for('edit_client_form_gui', client_id=client.id) }}">Edit</a> |
+                <a href="{{ url_for('delete_client_gui', client_id=client.id) }}" 
+                   onclick="return confirm('Are you sure you want to delete this client?')" 
+                   style="color: red;">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if not clients %}
+<p>No clients found. <a href="{{ url_for('new_client_form_gui') }}">Create your first client</a>.</p>
+{% endif %}
+
+{% endblock %} 

@@ -4,7 +4,18 @@
 <h1>Create New Engagement</h1>
 <form method="post" action="{{ url_for('create_engagement_gui') }}">
     <div><label for="engagement_name">Engagement Name:</label><input type="text" id="engagement_name" name="engagement_name" required></div>
-    <div><label for="client_name">Client Name:</label><input type="text" id="client_name" name="client_name" required></div>
+    <div>
+        <label for="client_id">Client:</label>
+        <select id="client_id" name="client_id" required>
+            <option value="">Select a client...</option>
+            {% for client in clients %}
+            <option value="{{ client.id }}">{{ client.name }}{% if client.company %} ({{ client.company }}){% endif %}</option>
+            {% endfor %}
+        </select>
+        {% if not clients %}
+        <p style="color: red; font-size: 12px;">No clients found. <a href="{{ url_for('new_client_form_gui') }}">Create a client first</a>.</p>
+        {% endif %}
+    </div>
     <div>
         <label for="engagement_status">Status:</label>
         <select id="engagement_status" name="engagement_status">

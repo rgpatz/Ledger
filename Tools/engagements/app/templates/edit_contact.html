@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Contact{% endblock %}
+
+{% block content %}
+<h1>Edit Contact for {{ client.name }}</h1>
+
+<form action="{{ url_for('update_contact_gui', client_id=client.id, contact_id=contact.id) }}" method="post">
+    <div>
+        <label for="name">Contact Name (Required):</label>
+        <input type="text" id="name" name="name" value="{{ contact.name }}" required>
+    </div>
+    
+    <div>
+        <label for="email">Email (Required):</label>
+        <input type="email" id="email" name="email" value="{{ contact.email }}" required>
+    </div>
+    
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" value="{{ contact.title or '' }}">
+    </div>
+    
+    <div>
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" value="{{ contact.phone or '' }}">
+    </div>
+    
+    <div>
+        <label>
+            <input type="checkbox" id="is_primary" name="is_primary" value="yes" {{ 'checked' if contact.is_primary == 'yes' else '' }}>
+            Primary Contact
+        </label>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <button type="submit" class="button">Update Contact</button>
+        <a href="{{ url_for('view_client_gui', client_id=client.id) }}" class="button" style="background-color: #6c757d; margin-left: 10px;">Cancel</a>
+    </div>
+</form>
+
+{% endblock %} 

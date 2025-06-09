@@ -24,5 +24,42 @@ services:
       - POSTGRES_PASSWORD=password #CHANGE THIS LATER!!!, it should be named in the .env or randomly generated
       - POSTGRES_DB=engagementdb
 
+  limesurvey:
+    image: docker.io/martialblog/limesurvey:latest
+    ports:
+      - "8080:8080" # LimeSurvey web interface
+    environment:
+      - DB_TYPE=pgsql
+      - DB_HOST=limesurvey_db
+      - DB_PORT=5432
+      - DB_USERNAME=limesurvey_user
+      - DB_PASSWORD=limesurvey_password
+      - DB_DATABASE=limesurvey
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=admin123
+      - ADMIN_NAME=Administrator
+      - ADMIN_EMAIL=admin@example.com
+      - PUBLIC_URL=http://localhost:8080
+    depends_on:
+      - limesurvey_db
+    volumes:
+      - limesurvey_data:/var/lib/limesurvey/upload
+      - limesurvey_plugins:/var/lib/limesurvey/plugins
+      - ./limesurvey-config.php:/var/www/html/application/config/config.php:ro
+
+  limesurvey_db:
+    image: postgres:15-alpine
+    volumes:
+      - limesurvey_postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432" # Different port to avoid conflict with main DB
+    environment:
+      - POSTGRES_USER=limesurvey_user
+      - POSTGRES_PASSWORD=limesurvey_password
+      - POSTGRES_DB=limesurvey
+
 volumes:
-  postgres_data: 
+  postgres_data:
+  limesurvey_data:
+  limesurvey_plugins:
+  limesurvey_postgres_data: 

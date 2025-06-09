@@ -17,7 +17,9 @@
 <body>
     <nav>
         <a href="{{ url_for('list_engagements_gui') }}">Engagements List</a> |
-        <a href="{{ url_for('new_engagement_form_gui') }}">New Engagement</a>
+        <a href="{{ url_for('new_engagement_form_gui') }}">New Engagement</a> |
+        <a href="{{ url_for('list_clients_gui') }}">Clients List</a> |
+        <a href="{{ url_for('new_client_form_gui') }}">New Client</a>
     </nav>
     <hr>
     {% block content %}{% endblock %}
