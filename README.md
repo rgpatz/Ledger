@@ -14,8 +14,205 @@ Key intended features for the overall platform include:
 
 The platform is being built with a focus on modularity using a microservices architecture to allow for scalability and easier integration of new features and tools over the semester.
 
+# Enhanced Engagement Management Service/Clients - Week 3 Deliverable
+## Module: Client Management (2nd Deliverable)
 
-# Engagement Management Service - Week 1 Deliverable
+# Client Contact Management System
+
+## Overview
+
+The engagements application now includes client contact management with support for multiple contacts per client. This feature allows you to:
+
+- Manage client information (name, company, address, phone, notes)
+- Store multiple contacts per client with different email addresses
+- Designate primary contacts
+- Link engagements to specific clients
+- View all client details and related engagements in one place
+
+## Database Structure
+
+### Tables Added
+
+1. **`clients`** - Stores client information
+   - `id` (Primary Key)
+   - `name` (Unique, Required)
+   - `company`
+   - `address`
+   - `phone`
+   - `notes`
+   - `created_at`, `updated_at`
+
+2. **`client_contacts`** - Stores contact information for clients
+   - `id` (Primary Key)
+   - `client_id` (Foreign Key to clients.id)
+   - `name` (Required)
+   - `email` (Required, validated)
+   - `title`
+   - `phone`
+   - `is_primary` ("yes" or "no")
+   - `created_at`, `updated_at`
+
+3. **`engagements`** - Updated to reference clients
+   - Added `client_id` (Foreign Key to clients.id)
+   - Kept `client_name` for backward compatibility
+
+## API Endpoints
+
+### Client Management
+
+- `GET /api/v1/clients` - List all clients
+- `POST /api/v1/clients` - Create new client (with contacts)
+- `GET /api/v1/clients/{client_id}` - Get client details
+- `PUT /api/v1/clients/{client_id}` - Update client
+- `DELETE /api/v1/clients/{client_id}` - Delete client
+
+### Contact Management
+
+- `POST /api/v1/clients/{client_id}/contacts` - Add contact to client
+- `GET /api/v1/clients/{client_id}/contacts` - List client contacts
+- `GET /api/v1/clients/{client_id}/contacts/{contact_id}` - Get contact details
+- `PUT /api/v1/clients/{client_id}/contacts/{contact_id}` - Update contact
+- `DELETE /api/v1/clients/{client_id}/contacts/{contact_id}` - Delete contact
+
+## Web Interface
+
+### Navigation
+- Added "Clients List" and "New Client" links to main navigation
+- Available at: `http://localhost:8000/clients`
+
+### Client Management Pages
+
+1. **Client List** (`/clients`)
+   - Shows all clients with primary contact information
+   - Actions: View, Edit, Delete
+
+2. **Create Client** (`/clients/new`)
+   - Create client with multiple contacts
+   - JavaScript-powered interface to add/remove contacts
+   - Automatic primary contact designation
+
+3. **View Client** (`/clients/{client_id}`)
+   - Complete client information
+   - All contacts with management actions
+   - Related engagements
+   - Quick actions to add contacts
+
+4. **Edit Client** (`/clients/{client_id}/edit`)
+   - Update client information
+   - Separate contact management
+
+### Contact Management
+
+1. **Add Contact** (`/clients/{client_id}/contacts/new`)
+2. **Edit Contact** (`/clients/{client_id}/contacts/{contact_id}/edit`)
+3. **Delete Contact** - Confirmation dialog
+
+### Updated Engagement Management
+
+- **Create Engagement**: Now uses client dropdown instead of text input
+- **Edit Engagement**: Client selection from existing clients
+- Automatic client name population from selected client
+
+## Usage Examples
+
+### Creating a Client with Multiple Contacts
+
+```json
+POST /api/v1/clients
+{
+  "name": "Acme Corporation",
+  "company": "Acme Corp",
+  "address": "123 Business St, City, State 12345",
+  "phone": "+1-555-0123",
+  "notes": "Important client",
+  "contacts": [
+    {
+      "name": "John Smith",
+      "email": "john.smith@acme.com",
+      "title": "IT Director",
+      "phone": "+1-555-0124",
+      "is_primary": "yes"
+    },
+    {
+      "name": "Jane Doe",
+      "email": "jane.doe@acme.com",
+      "title": "Security Manager",
+      "phone": "+1-555-0125",
+      "is_primary": "no"
+    }
+  ]
+}
+```
+
+### Adding Additional Contact
+
+```json
+POST /api/v1/clients/1/contacts
+{
+  "name": "Bob Johnson",
+  "email": "bob.johnson@acme.com",
+  "title": "CTO",
+  "phone": "+1-555-0126",
+  "is_primary": "no"
+}
+```
+
+## Features
+
+### Email Validation
+- Uses Pydantic EmailStr for automatic email validation
+- Ensures all email addresses are properly formatted
+
+### Primary Contact Management
+- Each client can have one primary contact
+- Primary contact is highlighted in listings
+- Automatic fallback to first contact if no primary designated
+
+### Relationship Management
+- Clients can have multiple engagements
+- Engagements are linked to clients via foreign key
+- View all client engagements from client detail page
+
+### Data Integrity
+- Foreign key constraints ensure data consistency
+- Cascade delete: Deleting a client removes all contacts and updates engagements
+- Unique client names prevent duplicates
+
+## Database Relationships
+
+```
+clients (1) -----> (*) client_contacts
+   |
+   | (1)
+   |
+   v
+   (*) engagements
+```
+
+## Migration Notes
+
+- New installations will create all tables automatically
+- Existing engagements will need client_id populated
+- Backward compatibility maintained with client_name field
+- No data loss during updates
+
+## Security Considerations
+
+- Email validation prevents malformed addresses
+- Client names must be unique
+- Proper foreign key constraints
+- Input sanitization on all forms
+
+## Testing
+
+Access the application at `http://localhost:8000` to test:
+
+1. Create a new client with multiple contacts
+2. View client details and contact information
+3. Create an engagement linked to the client
+4. Edit client and contact information
+5. Test email validation and primary contact features
+
 
 ## Module: Engagement Management Service (1st Deliverable)
 
