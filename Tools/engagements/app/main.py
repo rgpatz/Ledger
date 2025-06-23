@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, Request, Form, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles # If you add CSS/JS
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.database import create_db_and_tables, get_db
@@ -14,6 +15,15 @@ from typing import Optional
 # Create database tables on startup, Alembic will be used later, need to figure out how to do this in a production environment. Needs to be called before the first request. Data will be overwritten each time for now.
 
 app = FastAPI(title="Engagement Management Tool")
+
+# Add CORS middleware to allow requests from Angular frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://localhost:4201"],  # Allow both frontend ports
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount API routers
 app.include_router(engagement_api.router)

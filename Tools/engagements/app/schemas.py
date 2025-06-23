@@ -28,7 +28,7 @@ class ClientContactRead(ClientContactBase):
     updated_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Client schemas
 class ClientBase(BaseModel):
@@ -55,7 +55,7 @@ class ClientRead(ClientBase):
     contacts: List[ClientContactRead] = []
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 # Engagement schemas (updated to work with clients)
 class EngagementBase(BaseModel):
@@ -88,4 +88,4 @@ class EngagementRead(EngagementBase):
     client: Optional[ClientRead] = None
 
     class Config:
-        from_attributes = True 
+        orm_mode = True 

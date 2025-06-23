@@ -22,7 +22,8 @@ def create_new_client(client: schemas.ClientCreate, db: Session = Depends(get_db
 @router.get("/", response_model=List[schemas.ClientRead])
 def read_clients(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     clients = crud.get_clients(db, skip=skip, limit=limit)
-    return clients
+    # Convert SQLAlchemy models to Pydantic models
+    return [schemas.ClientRead.from_orm(client) for client in clients]
 
 @router.get("/{client_id}", response_model=schemas.ClientRead)
 def read_client(client_id: int, db: Session = Depends(get_db)):

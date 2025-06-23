@@ -1,15 +1,27 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from . import models, schemas
 
 # Engagement CRUD operations
 def get_engagement(db: Session, engagement_id: int):
-    return db.query(models.Engagement).filter(models.Engagement.id == engagement_id).first()
+    return db.query(models.Engagement).options(joinedload(models.Engagement.client)).filter(models.Engagement.id == engagement_id).first()
 
 def get_engagements(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Engagement).offset(skip).limit(limit).all()
+    return db.query(models.Engagement).options(joinedload(models.Engagement.client)).offset(skip).limit(limit).all()
+
+def get_engagements_by_client(db: Session, client_id: int):
+    return db.query(models.Engagement).options(joinedload(models.Engagement.client)).filter(models.Engagement.client_id == client_id).all()
 
 def create_engagement(db: Session, engagement: schemas.EngagementCreate):
-    db_engagement = models.Engagement(**engagement.dict())
+    # First verify the client exists
+    client = db.query(models.Client).filter(models.Client.id == engagement.client_id).first()
+    if not client:
+        return None
+    
+    # Set client_name from the actual client record for consistency
+    engagement_data = engagement.dict()
+    engagement_data['client_name'] = client.name
+    
+    db_engagement = models.Engagement(**engagement_data)
     db.add(db_engagement)
     db.commit()
     db.refresh(db_engagement)
@@ -19,6 +31,14 @@ def update_engagement(db: Session, engagement_id: int, engagement_update: schema
     db_engagement = get_engagement(db, engagement_id)
     if db_engagement:
         update_data = engagement_update.dict(exclude_unset=True)
+        
+        # If client_id is being updated, verify the new client exists and update client_name
+        if 'client_id' in update_data:
+            client = db.query(models.Client).filter(models.Client.id == update_data['client_id']).first()
+            if not client:
+                return None
+            update_data['client_name'] = client.name
+        
         for key, value in update_data.items():
             setattr(db_engagement, key, value)
         db.commit()
@@ -34,13 +54,13 @@ def delete_engagement(db: Session, engagement_id: int):
 
 # Client CRUD operations
 def get_client(db: Session, client_id: int):
-    return db.query(models.Client).filter(models.Client.id == client_id).first()
+    return db.query(models.Client).options(joinedload(models.Client.contacts)).filter(models.Client.id == client_id).first()
 
 def get_client_by_name(db: Session, name: str):
-    return db.query(models.Client).filter(models.Client.name == name).first()
+    return db.query(models.Client).options(joinedload(models.Client.contacts)).filter(models.Client.name == name).first()
 
 def get_clients(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Client).offset(skip).limit(limit).all()
+    return db.query(models.Client).options(joinedload(models.Client.contacts)).offset(skip).limit(limit).all()
 
 def create_client(db: Session, client: schemas.ClientCreate):
     # Create client without contacts first
